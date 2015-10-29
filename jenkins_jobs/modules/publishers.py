@@ -5377,6 +5377,147 @@ def phabricator(parser, xml_parent, data):
             data.get('comment-with-console-link-on-failure')).lower()
 
 
+def veracode(parser, xml_parent, data):
+    """yaml: veracode
+    Upload and Scan with `Veracode <https://www.veracode.com/>`_
+
+    Requires Veracode's official Jenkins Plugin.  *DOES NOT WORK* with
+    :jenkins-wiki:`Veracode Scanner Plugin <Veracode+Scanner+Plugin>`.
+
+    :arg str application-name: The name of the application. This can be an
+      application that already exists on the Veracode Platform, or a new one
+      that Jenkins creates. Use $projectname to use the Jenkins project name
+      as the application name. (required)
+    :arg bool create-application: Create a new application if a matching
+      application is not found on the Veracode Platform.  If set to false and
+      a matching application is not found on the Veracode Platform, the
+      Jenkins build will fail. (default: true)
+    :arg str business-criticality: Business criticality for the application,
+      one of "Very High", "High", "Medium", "Low", "Very Low".
+      (default: "Very High")
+    :arg str sandbox-name: The name of the sandbox. This can be a sandbox that
+      already exists on the Veracode Platform, or a new one that Jenkins
+      creates. If left empty no sandbox is used. (optional)
+    :arg bool create-sandbox: Create a new sandbox if a sandbox name is
+      provided and a matching sandbox is not found on the Veracode Platform.
+      If the checkbox is not selected, a sandbox name is provided, and a
+      matching sandbox is not found on the Veracode Platform, the Jenkins
+      build will fail. (default: false)
+    :arg str scan-name: The name for the static scan you want to submit to the
+      Veracode Platform for this application. Scan name is equivalent to
+      Version or Build in the Veracode API. Enter $buildnumber to use the
+      Jenkins project build number as the scan name. Enter $timestamp to use
+      the date and time of the build job submission. (required)
+    :arg str upload-include: The filepaths of the files to upload for scanning,
+      represented as a comma-separated list of ant-style include patterns
+      relative to the job's workspace root directory. Patterns are case-
+      sensitive. Patterns that include commas because they denote filepaths
+      that contain commas need to have the commas replaced with a wildcard
+      character. All files in the job's workspace root directory are included
+      when the parameter omitted. (default: **/**.jar)
+    :arg str upload-exclude: The filepaths of the files *not* to upload for
+      scanning, represented as a comma-separated list of ant-style include
+      patterns relative to the job's workspace root directory. Patterns are
+      case-sensitive. Patterns that include commas because they denote
+      filepaths that contain commas need to have the commas replaced with a
+      wildcard character. All files in the job's workspace root directory are
+      included when the parameter omitted. (optional)
+    :arg str scan-include: The filenames of the uploaded files to scan as top
+      level modules, represented as a comma-separated list of ant-style-like
+      include patterns such that '*' matches 0 or more characters and '?'
+      matches exactly 1 character. Patterns are case-sensitive. Patterns that
+      include commas because they denote filenames that contain commas need to
+      have the commas replaced with a wildcard character. Because the matching
+      is performed based only on filename, it is incorrect to use patterns
+      that include path separators ('\\' or '/'). All uploaded files are
+      included when omitted. (optional)
+    :arg str scan-exclude: The filenames of the uploaded files *not* to scan
+      as top level modules, represented as a comma-separated list of ant-
+      style-like exclude patterns such that '*' matches 0 or more characters
+      and '?' matches exactly 1 character. Patterns are case-sensitive.
+      Patterns that include commas because they denote filenames that contain
+      commas need to have the commas replaced with a wildcard character.
+      Because the matching is performed based only on filename, it is
+      incorrect to use patterns that include path separators ('\\' or '/'). No
+      uploaded files are excluded when omitted. (optional)
+    :arg str save-as-filenames: The filename pattern that represents the names
+      of the uploaded files that should be saved with a different name. The
+      '*' wildcard matches 0 or more characters. The '?' wildcard matches
+      exactly 1 character. Each wildcard corresponds to a numbered group that
+      can be referenced in the replacement pattern. Pattern is case-sensitive.
+      Because the matching is performed based only on filename, it is
+      incorrect to use patterns that include path separators ('\\' or '/'). No
+      uploaded files are saved with a different name when either the filename
+      pattern or the replacement pattern is omitted. (optional)
+    :arg str save-as-replacements: The replacement pattern that represents the
+      groups captured by the filename pattern. For example, if the filename
+      pattern is '*-*-SNAPSHOT.war' and the replacement pattern
+      '$1-master-SNAPSHOT.war', an uploaded file named
+      'app-branch-SNAPSHOT.war' would be saved as 'app-master-SNAPSHOT.war'.
+      In order to specify a replacement pattern that includes a reference to a
+      captured group followed by a number place the captured group's index
+      inside curly braces. For example, if the filename pattern is
+      '*-*-SNAPSHOT.war' and the replacement pattern
+      '${1}5-master-SNAPSHOT.war', an uploaded file named
+      'app-branch-SNAPSHOT.war' would be saved as 'app5-master-SNAPSHOT.war'.
+      New filenames for uploaded files must be valid. Path separators
+      ('\\' or '/') should not be included. No uploaded files are saved with a
+      different name when either the filename pattern or the replacement
+      pattern is omitted.  (optional)
+
+    Note:
+      The configuration parameter for "Use global Veracode user credentials"
+      will always be true in order to avoid storing credentials in the clear.
+      You will have to configure these in your Jenkins instance directly.
+
+    Example:
+
+    .. literalinclude::
+        /../../tests/publishers/fixtures/veracode001.yaml
+       :language: yaml
+    """
+
+    root = XML.SubElement(xml_parent,
+                          'com.veracode.jenkins.plugin.VeracodeNotifier')
+
+    for req, tag in (('application-name', '__appname'),
+                     ('scan-name', '__version')):
+        if req not in data.keys():
+            raise JenkinsJobsException('veracode publisher requires both '
+                                       'application-name and scan-name keys')
+        XML.SubElement(root, tag).text = str(data.get(req))
+
+    XML.SubElement(root, '__createprofile').text = str(
+        data.get('create-application', 'true')).lower()
+    XML.SubElement(root, '__createsandbox').text = str(
+        data.get('create-sandbox', 'false')).lower()
+
+    if 'business-criticality' not in data.keys():
+        bcstr = 'Very High'
+    else:
+        bcopts = ('Very High', 'High', 'Medium', 'Low', 'Very Low')
+        if data['business-criticality'] not in bcopts:
+            raise JenkinsJobsException('business-criticality must be one of '
+                                       + bcopts)
+        bcstr = data['business-criticality']
+    XML.SubElement(root, '__criticality').text = bcstr
+
+    XML.SubElement(root, '__sandboxname').text = data.get(
+        'sandbox-name', '')
+    XML.SubElement(root, '__uploadincludespattern').text = data.get(
+        'upload-include', '**/**.jar')
+    XML.SubElement(root, '__uploadexcludespattern').text = data.get(
+        'upload-exclude', '')
+    XML.SubElement(root, '__scanincludespattern').text = data.get(
+        'scan-include', '')
+    XML.SubElement(root, '__scanexcludespattern').text = data.get(
+        'scan-exclude', '')
+    XML.SubElement(root, '__filenamepattern').text = data.get(
+        'save-as-filenames', '')
+    XML.SubElement(root, '__replacementpattern').text = data.get(
+        'save-as-replacements', '')
+
+
 class Publishers(jenkins_jobs.modules.base.Base):
     sequence = 70
 
