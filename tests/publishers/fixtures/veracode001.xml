@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <publishers>
+    <com.veracode.jenkins.plugin.VeracodeNotifier>
+      <__appname>myapp</__appname>
+      <__version>$buildnumber</__version>
+      <__createprofile>true</__createprofile>
+      <__createsandbox>false</__createsandbox>
+      <__criticality>Very High</__criticality>
+      <__sandboxname/>
+      <__uploadincludespattern>**/**.jar</__uploadincludespattern>
+      <__uploadexcludespattern/>
+      <__scanincludespattern/>
+      <__scanexcludespattern/>
+      <__filenamepattern/>
+      <__replacementpattern/>
+    </com.veracode.jenkins.plugin.VeracodeNotifier>
+  </publishers>
+</project>

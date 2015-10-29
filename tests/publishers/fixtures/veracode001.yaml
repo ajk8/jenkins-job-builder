@@ -1,0 +1,4 @@
+publishers:
+    - veracode:
+        application-name: 'myapp'
+        scan-name: '$buildnumber'
