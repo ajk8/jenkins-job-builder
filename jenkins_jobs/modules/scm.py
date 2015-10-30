@@ -1109,9 +1109,12 @@ def url_copy(parser, xml_parent, data):
     :arg bool clear-workspace: If set to true, clear the workspace before
         downloading the artifact(s) specified in url-list. (default: false)
 
-    Example:
+    Examples:
     .. literalinclude::
         ../../tests/scm/fixtures/url-copy001.yaml
+       :language: yaml
+    .. literalinclude::
+        ../../tests/scm/fixtures/url-copy002.yaml
        :language: yaml
     """
 
@@ -1125,8 +1128,8 @@ def url_copy(parser, xml_parent, data):
         url_tuple = XML.SubElement(urls,
                                    'hudson.plugins.URLSCM.URLSCM_-URLTuple')
         XML.SubElement(url_tuple, 'urlString').text = data_url
-    XML.SubElement(scm, 'clearWorkspace').text = data.get('clear-workspace',
-                                                          'false').lower()
+    XML.SubElement(scm, 'clearWorkspace').text = \
+        str(data.get('clear-workspace', 'false')).lower()
 
 
 class SCM(jenkins_jobs.modules.base.Base):
