@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <publishers>
+    <com.veracode.jenkins.plugin.VeracodeNotifier>
+      <__appname>myinternalwebapp</__appname>
+      <__version>build-$buildnumber</__version>
+      <__createprofile>true</__createprofile>
+      <__createsandbox>true</__createsandbox>
+      <__criticality>VeryLow</__criticality>
+      <__sandboxname>sandy-testing</__sandboxname>
+      <__uploadincludespattern>*.war</__uploadincludespattern>
+      <__uploadexcludespattern/>
+      <__scanincludespattern/>
+      <__scanexcludespattern/>
+      <__filenamepattern>*-*-SNAPSHOT.war</__filenamepattern>
+      <__replacementpattern>${1}5-master-SNAPSHOT.war</__replacementpattern>
+    </com.veracode.jenkins.plugin.VeracodeNotifier>
+  </publishers>
+</project>
