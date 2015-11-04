@@ -5393,8 +5393,8 @@ def veracode(parser, xml_parent, data):
       a matching application is not found on the Veracode Platform, the
       Jenkins build will fail. (default: true)
     :arg str business-criticality: Business criticality for the application,
-      one of "Very High", "High", "Medium", "Low", "Very Low".
-      (default: "Very High")
+      one of "VeryHigh", "High", "Medium", "Low", "VeryLow".
+      (default: "VeryHigh")
     :arg str sandbox-name: The name of the sandbox. This can be a sandbox that
       already exists on the Veracode Platform, or a new one that Jenkins
       creates. If left empty no sandbox is used. (optional)
@@ -5470,10 +5470,13 @@ def veracode(parser, xml_parent, data):
       will always be true in order to avoid storing credentials in the clear.
       You will have to configure these in your Jenkins instance directly.
 
-    Example:
+    Examples:
 
     .. literalinclude::
         /../../tests/publishers/fixtures/veracode001.yaml
+       :language: yaml
+    .. literalinclude::
+        /../../tests/publishers/fixtures/veracode002.yaml
        :language: yaml
     """
 
@@ -5493,9 +5496,9 @@ def veracode(parser, xml_parent, data):
         data.get('create-sandbox', 'false')).lower()
 
     if 'business-criticality' not in data.keys():
-        bcstr = 'Very High'
+        bcstr = 'VeryHigh'
     else:
-        bcopts = ('Very High', 'High', 'Medium', 'Low', 'Very Low')
+        bcopts = ('VeryHigh', 'High', 'Medium', 'Low', 'VeryLow')
         if data['business-criticality'] not in bcopts:
             raise JenkinsJobsException('business-criticality must be one of '
                                        + bcopts)

@@ -6,7 +6,7 @@
       <__version>$buildnumber</__version>
       <__createprofile>true</__createprofile>
       <__createsandbox>false</__createsandbox>
-      <__criticality>Very High</__criticality>
+      <__criticality>VeryHigh</__criticality>
       <__sandboxname/>
       <__uploadincludespattern>**/**.jar</__uploadincludespattern>
       <__uploadexcludespattern/>
