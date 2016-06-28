@@ -1,0 +1,11 @@
+publishers:
+    - veracode:
+        application-name: 'myinternalwebapp'
+        business-criticality: 'VeryLow'
+        scan-name: 'build-$buildnumber'
+        sandbox-name: 'sandy-testing'
+        create-sandbox: true
+        upload-include: '*.war'
+        save-as-filenames: '*-*-SNAPSHOT.war'
+        save-as-replacements: '${1}5-master-SNAPSHOT.war'
+        wait-for-scan-timeout: 10
