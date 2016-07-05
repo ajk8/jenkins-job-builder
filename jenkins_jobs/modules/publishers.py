@@ -5464,6 +5464,8 @@ def veracode(parser, xml_parent, data):
       ('\\' or '/') should not be included. No uploaded files are saved with a
       different name when either the filename pattern or the replacement
       pattern is omitted.  (optional)
+    :arg str wait-for-scan-timeout: Enable and wait for scan to finish for
+      `timeout` minutes.  (optional)
 
     Note:
       The configuration parameter for "Use global Veracode user credentials"
@@ -5519,6 +5521,11 @@ def veracode(parser, xml_parent, data):
         'save-as-filenames', '')
     XML.SubElement(root, '__replacementpattern').text = data.get(
         'save-as-replacements', '')
+
+    if 'wait-for-scan-timeout' in data.keys():
+        XML.SubElement(root, '__waitforscan').text = 'true'
+        XML.SubElement(root, '__timeout').text = data.get(
+            'wait-for-scan-timeout', '')
 
 
 class Publishers(jenkins_jobs.modules.base.Base):
